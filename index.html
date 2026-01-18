@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartas para Sofia 💌</title>
+    <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #fdf2e9;
+            background-image: radial-gradient(#ffddd2 2px, transparent 2px);
+            background-size: 30px 30px;
+            font-family: 'Nunito', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #d35400;
+            margin-bottom: 10px;
+        }
+
+        p.subtitle {
+            color: #888;
+            margin-bottom: 40px;
+        }
+
+        /* Grade de Envelopes */
+        .grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-width: 800px;
+        }
+
+        .envelope {
+            background: #fff;
+            width: 280px;
+            height: 180px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Detalhe visual de envelope */
+        .envelope::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 0; 
+            height: 0; 
+            border-left: 140px solid transparent;
+            border-right: 140px solid transparent;
+            border-top: 100px solid #ffe6e6; /* Cor da aba */
+        }
+
+        .envelope:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            border-color: #ffadad;
+        }
+
+        .envelope h3 {
+            margin-top: 60px; /* Espaço da aba */
+            color: #555;
+            font-size: 1.1rem;
+            z-index: 10;
+        }
+
+        .icon {
+            font-size: 2rem;
+            margin-top: 10px;
+        }
+
+        /* Modal (A Carta Aberta) */
+        #modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+            padding: 20px;
+        }
+
+        #modal.aberto {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .papel-carta {
+            background: #fffdf0; /* Cor de papel antigo */
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            border-radius: 5px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            transform: scale(0.8);
+            transition: transform 0.3s;
+            max-height: 80vh;
+            overflow-y: auto; /* Rolagem se o texto for grande */
+            border-left: 5px solid #ffadad; /* Margem de caderno */
+        }
+
+        #modal.aberto .papel-carta {
+            transform: scale(1);
+        }
+
+        .fechar {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        /* Texto da Carta */
+        .texto-carta {
+            font-family: 'Indie Flower', cursive; /* Fonte manuscrita */
+            font-size: 1.4rem;
+            color: #444;
+            line-height: 1.6;
+            white-space: pre-wrap; /* Respeita os parágrafos */
+        }
+
+        .foto-carta {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none; /* Escondido por padrão */
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Abra quando... 💌</h1>
+    <p class="subtitle">Escolha o envelope que combina com seu dia</p>
+
+    <div class="grid">
+        <div class="envelope" onclick="abrirCarta(0)">
+            <h3>...estiver com saudades</h3>
+            <div class="icon">😢</div>
+        </div>
+
+        <div class="envelope" onclick="abrirCarta(1)">
+            <h3>...estiver triste</h3>
+            <div class="icon">🌧️</div>
+        </div>
+
+        <div class="envelope" onclick="abrirCarta(2)">
+            <h3>...estiver brava comigo</h3>
+            <div class="icon">😤</div>
+        </div>
+
+        <div class="envelope" onclick="abrirCarta(3)">
+            <h3>...precisar sorrir</h3>
+            <div class="icon">😂</div>
+        </div>
+        
+        <div class="envelope" onclick="abrirCarta(4)">
+            <h3>...quiser lembrar de nós</h3>
+            <div class="icon">❤️</div>
+        </div>
+
+        <div class="envelope" onclick="abrirCarta(5)">
+            <h3>...for dormir</h3>
+            <div class="icon">🌙</div>
+        </div>
+    </div>
+
+    <div id="modal">
+        <div class="papel-carta">
+            <span class="fechar" onclick="fecharCarta()">&times;</span>
+            <img id="imgCarta" class="foto-carta" src="" alt="Foto">
+            <div id="conteudoCarta" class="texto-carta"></div>
+        </div>
+    </div>
+
+    <script>
+        // AQUI VOCÊ ESCREVE SUAS CARTAS
+        const cartas = [
+            // CARTA 0: Saudades
+            {
+                texto: "Sofia,\n\nEu sei que a saudade aperta às vezes. Queria estar aí agora para te dar aquele abraço que estala as costas.\n\nLembre-se que essa distância é só física. Meu pensamento está 24h com você.\n\nLogo a gente se vê! Te amo!",
+                imagem: "https://media.giphy.com/media/VbawWIGNtWAu7BNnSG/giphy.gif" // Link de gif de abraço
+            },
+            
+            // CARTA 1: Triste
+            {
+                texto: "Ei, psiu.\n\nDias ruins acontecem, mas eles não duram pra sempre. \n\nVocê é mais forte do que imagina e eu tenho um orgulho danado de você. \n\nRespira fundo, lava o rosto e lembra que eu estou aqui torcendo por você.",
+                imagem: "" // Sem imagem, só texto
+            },
+
+            // CARTA 2: Brava comigo
+            {
+                texto: "Ok, eu devo ter feito alguma besteira. Desculpa!\n\nEu sou meio lerdão às vezes, mas minha intenção nunca é te magoar. \n\nVamos conversar? Prometo ouvir e tentar melhorar. Não fica brava, seu sorriso é muito mais bonito!",
+                imagem: "https://media.giphy.com/media/l4pTdcifPZLpDjL1e/giphy.gif" // Gif pedindo desculpa
+            },
+
+            // CARTA 3: Precisar sorrir
+            {
+                texto: "Lembra daquela vez que a gente [INSIRA UMA HISTÓRIA ENGRAÇADA AQUI]?\n\nSempre que eu lembro disso eu dou risada sozinho. \n\nSe isso não funcionou, saiba que você ganhou um vale 'Comida Favorita' agora. É só cobrar.",
+                imagem: "https://media.giphy.com/media/10JhviFuU2gWD6/giphy.gif"
+            },
+
+            // CARTA 4: Lembrar de nós
+            {
+                texto: "Sofia, você é a melhor coisa que aconteceu no meu ano.\n\nObrigado por ser minha parceira, minha amiga e meu amor.\n\nCada dia ao seu lado é um presente.",
+                imagem: "" 
+            },
+
+            // CARTA 5: Dormir
+            {
+                texto: "Boa noite, princesa.\n\nEspero que seu dia tenha terminado bem. Descansa bastante.\n\nSonha com os anjos (ou comigo, que sou quase um rs). Beijo de boa noite!",
+                imagem: ""
+            }
+        ];
+
+        function abrirCarta(index) {
+            const carta = cartas[index];
+            const modal = document.getElementById('modal');
+            const texto = document.getElementById('conteudoCarta');
+            const img = document.getElementById('imgCarta');
+
+            // Coloca o texto
+            texto.innerText = carta.texto;
+
+            // Coloca a imagem (se tiver)
+            if (carta.imagem) {
+                img.src = carta.imagem;
+                img.style.display = 'block';
+            } else {
+                img.style.display = 'none';
+            }
+
+            modal.classList.add('aberto');
+        }
+
+        function fecharCarta() {
+            document.getElementById('modal').classList.remove('aberto');
+        }
+
+        // Fecha se clicar fora do papel
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                fecharCarta();
+            }
+        });
+    </script>
+
+</body>
+</html>
